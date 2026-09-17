@@ -1,0 +1,52 @@
+# ============================================================================
+# .gitignore para proyectos de Ren'Py
+# ----------------------------------------------------------------------------
+# Este archivo vive en la raíz del repositorio y cubre CUALQUIER proyecto
+# de Ren'Py dentro de él, sin importar en qué subcarpeta esté (por ejemplo
+# "libreria/"), gracias al uso de patrones "**/" que buscan en cualquier
+# nivel de profundidad.
+# ============================================================================
+
+# --- Carpetas que Ren'Py modifica mientras se juega ---
+**/game/saves/
+**/game/cache/
+
+# --- Archivos compilados por Ren'Py (se regeneran automáticamente) ---
+# Importante: NO ignorar los .rpyc si el proyecto se distribuye ya
+# compilado; para un repositorio de desarrollo/librería sí conviene
+# ignorarlos, porque se generan de nuevo con cada ejecución.
+**/game/**/*.rpyc
+**/game/**/*.rpymc
+**/game/**/*.rpyb
+
+# --- Copias de seguridad que Ren'Py puede generar al guardar cambios ---
+**/game/**/*.bak
+**/game/**/*.new
+**/game/**/*.old
+
+# --- Archivos de error, registro y depuración generados al ejecutar el juego ---
+**/errors.txt
+**/files.txt
+**/image_cache.txt
+**/log.txt
+**/save_dump.txt
+**/traceback.txt
+
+# --- Archivos generados por el Launcher de Ren'Py (análisis de diálogos, etc.) ---
+**/dialogue.tab
+**/dialogue.txt
+**/strings.json
+
+# --- Carpetas de compilación / distribución generadas al exportar el juego ---
+**/*-dists/
+**/*-web/
+
+# --- Archivos propios del sistema operativo ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# --- Configuración local de editores de código (opcional) ---
+.vscode/
+.idea/
