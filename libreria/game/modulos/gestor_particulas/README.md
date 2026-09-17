@@ -1,0 +1,436 @@
+# Gestor de Partículas (nieve, lluvia y efectos propios)
+
+Módulo "copiar y pegar" para proyectos de **Ren'Py**. Permite activar y
+desactivar efectos de partículas en pantalla (nieve, lluvia, hojas,
+chispas, polvo mágico, etc.) con una sola línea de código, en cualquier
+punto del guion.
+
+Las partículas se pueden dibujar de dos formas:
+
+- **Con una imagen** (por ejemplo, la imagen de un copo de nieve).
+- **Con un color plano** (un círculo o un rectángulo de color, sin
+  necesitar ningún archivo de imagen) — funciona perfecto para simular
+  nieve (círculos blancos) o lluvia (rayas celestes), como pediste.
+
+No hace falta saber programar para usar los efectos ya armados de nieve
+y lluvia: seguí los pasos de más abajo. Si más adelante querés crear tus
+propios efectos, en la sección "Cómo crear tu propio efecto" te muestro
+cómo, con ejemplos; y en "Cómo armar tus propios 'prefabs'" te muestro
+la forma recomendada de guardarlos organizados, en tu propio archivo,
+sin tocar el módulo y sin ensuciar el guion de tu historia con
+parámetros de configuración.
+
+## Qué hay en esta carpeta
+
+```
+gestor_particulas/
+├── modulo_gestor_particulas.rpy   <- el módulo en sí (motor + nieve y lluvia)
+└── README.md                      <- este archivo
+```
+
+Este módulo no necesita ningún archivo de imagen ni de sonido para
+funcionar: los efectos de nieve y lluvia que trae por defecto se dibujan
+solos, como figuras de color plano. Si más adelante querés usar tus
+propias imágenes (por ejemplo, un copo de nieve dibujado), simplemente
+las copiás dentro de la carpeta `game/` de tu proyecto y apuntás a esa
+ruta desde la configuración (ver más abajo).
+
+## Cómo instalarlo
+
+1. Copiá **toda esta carpeta** (`gestor_particulas`, con todo lo que
+   tiene adentro) dentro de la carpeta `game/modulos/` de tu proyecto de
+   Ren'Py. Si tu proyecto no tiene una carpeta `game/modulos/`, creala
+   vos mismo y pegá la carpeta del módulo ahí adentro.
+
+   Al final te tiene que quedar así:
+
+   ```
+   tu_proyecto/
+   └── game/
+       └── modulos/
+           └── gestor_particulas/
+               ├── modulo_gestor_particulas.rpy
+               └── README.md
+   ```
+
+2. No hace falta tocar ningún otro archivo del proyecto. Ren'Py carga
+   automáticamente todos los archivos `.rpy` que encuentra, sin importar
+   en qué subcarpeta estén.
+
+3. Abrí el proyecto con el Ren'Py Launcher y ejecutalo. El módulo queda
+   listo para usar, pero **no activa ningún efecto solo**: vos decidís
+   desde tu guion cuándo prender y apagar cada uno (ver "Uso básico" más
+   abajo).
+
+## Uso básico dentro del guión (`script.rpy`)
+
+La función principal del módulo es `gp_crear_particulas(...)`: le pasás
+los parámetros que quieras (color, tamaño, ángulo, velocidad, etc.) y te
+devuelve un **identificador**. Ese identificador es lo único que
+necesitás guardar para poder apagar ese efecto en particular más
+adelante, con `gp_terminar_particulas(id)`.
+
+Además, el módulo trae dos atajos ya configurados —`gp_nieve()` y
+`gp_lluvia()`— que internamente llaman a `gp_crear_particulas()` con los
+valores de la sección "CONFIGURACION" del archivo `.rpy`. Funcionan
+igual: también devuelven un identificador.
+
+**Prender nieve o lluvia con los valores ya configurados:**
+
+```renpy
+scene bg pueblo_nevado
+$ id_clima = gp_nieve()
+
+e "Está nevando otra vez..."
+```
+
+**Apagar ese efecto** (usando el identificador que guardaste):
+
+```renpy
+$ gp_terminar_particulas(id_clima)
+```
+
+**Cambiar de un efecto a otro** (útil cuando la historia salta de
+escena y el clima cambia con ella, por ejemplo de nieve a lluvia):
+
+```renpy
+scene bg calle_lluviosa
+$ gp_terminar_particulas(id_clima)
+$ id_clima = gp_lluvia()
+
+e "Uy, empezó a llover."
+```
+
+**Crear un efecto propio al vuelo, sin depender de nieve o lluvia**,
+pasándole vos mismo todos los parámetros:
+
+```renpy
+$ id_chispas = gp_crear_particulas(
+      color=["#FFCC66", "#FF9933", "#FF6600"], forma="circulo",
+      tamano_min=2, tamano_max=5, cantidad=25,
+      angulo_base=270, angulo_variacion=30,
+      velocidad_min=30, velocidad_max=70,
+      origen="abajo", tiempo_vida_min=0.8, tiempo_vida_max=1.6,
+  )
+...
+$ gp_terminar_particulas(id_chispas)
+```
+
+**Apagar todos los efectos activos de una:**
+
+```renpy
+$ gp_terminar_todas()
+```
+
+**Saber si un efecto sigue activo** (por si necesitás una condición):
+
+```renpy
+if gp_efecto_activo(id_clima):
+    e "Todavía sigue lloviendo."
+```
+
+> El efecto queda prendido hasta que vos lo apagues explícitamente con
+> `gp_terminar_particulas()` (o `gp_terminar_todas()`): no se apaga solo
+> al cambiar de fondo con `scene` ni al hacer un `jump` a otra etiqueta.
+> Esto es a propósito, para que el clima se mantenga mientras avanza la
+> historia (por ejemplo, durante varias escenas seguidas bajo la
+> lluvia) y para que seas vos quien decide en qué momento exacto empieza
+> y termina cada efecto. Por eso es importante que guardes el
+> identificador que te devuelve `gp_crear_particulas()` / `gp_nieve()` /
+> `gp_lluvia()` en una variable (por ejemplo, guardada con `default` en
+> tu guión) si más adelante vas a necesitar apagar ese efecto puntual.
+
+## Cómo configurar la nieve y la lluvia
+
+Todo lo que podés cambiar está junto, arriba del todo del archivo
+`modulo_gestor_particulas.rpy`, en la sección que dice
+**"CONFIGURACION"**. Cada línea tiene una explicación en español simple
+arriba. Estos son los parámetros más importantes:
+
+| Variable (con prefijo `GP_NIEVE_` o `GP_LLUVIA_`) | Para qué sirve |
+|---|---|
+| `CANTIDAD` | Cuántas partículas hay en pantalla al mismo tiempo. |
+| `COLOR` | Color plano de la partícula (si no se usa imagen). |
+| `IMAGENES` | Lista de imágenes a usar en vez de color plano. `None` = sin imagen. |
+| `TAMANO_MIN` / `TAMANO_MAX` | Rango de tamaño (en píxeles) de cada partícula. |
+| `ANGULO_BASE` / `ANGULO_VARIACION` | Hacia dónde "sale" la partícula y cuánto varía al azar (ver más abajo). |
+| `VELOCIDAD_MIN` / `VELOCIDAD_MAX` | Rango de velocidad, en píxeles por segundo. |
+| `ONDULADO` (solo nieve) | `True` = vaivén lateral tipo viento. `False` = movimiento en línea recta. |
+| `ROTAR` (solo nieve) | Si la partícula gira sobre sí misma mientras se mueve. |
+| `OPACIDAD_MIN` / `OPACIDAD_MAX` | Rango de transparencia de cada partícula. |
+
+Para cambiar cualquier cosa: abrí `modulo_gestor_particulas.rpy` con un
+editor de texto, cambiá el valor después del `=`, y guardá.
+
+### Cómo funciona el ángulo
+
+El ángulo se mide en grados, igual que las agujas de un reloj pero
+empezando desde la derecha:
+
+```
+              270 (arriba)
+                  |
+  180 (izq.) ---- + ---- 0 (derecha)
+                  |
+              90 (abajo)
+```
+
+La nieve y la lluvia usan un ángulo cercano a 90 (hacia abajo). Si
+quisieras, por ejemplo, chispas que suben desde una fogata, usarías un
+ángulo cercano a 270 (hacia arriba).
+
+### Usar tus propias imágenes en vez de color plano
+
+1. Copiá tu imagen (por ejemplo `copo.png`) dentro de la carpeta
+   `game/` de tu proyecto. Podés crear una carpeta
+   `game/modulos/gestor_particulas/imagenes/` para ordenarla.
+2. Cambiá `GP_NIEVE_IMAGENES` (o `GP_LLUVIA_IMAGENES`) para que apunte a
+   esa ruta:
+
+   ```renpy
+   define GP_NIEVE_IMAGENES = ["modulos/gestor_particulas/imagenes/copo.png"]
+   ```
+
+3. Si le pasás más de una imagen en la lista, cada partícula elige una
+   al azar — útil para mezclar, por ejemplo, dos o tres formas de copo
+   distintas.
+
+## Cómo crear tu propio efecto
+
+Además de la nieve y la lluvia, podés crear cualquier otro efecto
+(hojas cayendo, chispas de fuego, pétalos, polvo mágico, luciérnagas,
+etc.) sin tocar el archivo del módulo, llamando directamente a
+`gp_crear_particulas(...)` con los parámetros que quieras desde tu
+propio `script.rpy` (o mejor, desde un archivo `.rpy` nuevo tuyo). No
+hace falta que el efecto exista de antemano: vos decidís todos sus
+parámetros en el momento de crearlo.
+
+**Ejemplo: hojas cayendo, girando, con imagen propia:**
+
+```renpy
+label bosque_otonal:
+    scene bg bosque
+    $ id_hojas = gp_crear_particulas(
+          imagenes=["imagenes/hoja1.png", "imagenes/hoja2.png"],
+          tamano_min=16, tamano_max=28,
+          cantidad=40,
+          angulo_base=100, angulo_variacion=25,
+          velocidad_min=40, velocidad_max=90,
+          ondulado=True, amplitud_ondulado=40, frecuencia_ondulado=0.4,
+          rotar=True, rotacion_velocidad_min=-90, rotacion_velocidad_max=90,
+          opacidad_min=0.7, opacidad_max=1.0,
+      )
+    e "Las hojas caen sin parar por acá."
+    ...
+    $ gp_terminar_particulas(id_hojas)
+```
+
+**Ejemplo: chispas de fuego que suben y se apagan solas (sin imagen,
+solo color), usando `tiempo_vida` en vez de reciclado por pantalla:**
+
+```renpy
+$ id_chispas = gp_crear_particulas(
+      color=["#FFCC66", "#FF9933", "#FF6600"],
+      forma="circulo",
+      tamano_min=2, tamano_max=5,
+      cantidad=25,
+      angulo_base=270, angulo_variacion=30,
+      velocidad_min=30, velocidad_max=70,
+      origen="abajo", origen_min=0.4, origen_max=0.6,
+      opacidad_min=0.4, opacidad_max=0.9,
+      tiempo_vida_min=0.8, tiempo_vida_max=1.6,
+  )
+```
+
+**Si vas a reutilizar el mismo efecto muchas veces** (por ejemplo, en
+varias etiquetas distintas), armá la receta una sola vez con
+`GP_TipoParticula(...)` guardada en un `define`, y pasásela a
+`gp_crear_particulas()` con `tipo=...` cada vez que la necesites, en vez
+de repetir todos los parámetros cada vez. A esa receta ya armada y
+guardada le podemos decir un **"prefab"**: la sección siguiente explica
+dónde conviene guardarla.
+
+## Cómo armar tus propios "prefabs" (sin tocar el módulo)
+
+Un "prefab" es simplemente un `GP_TipoParticula(...)` guardado en un
+`define`, con un nombre, listo para usar en cualquier parte de tu juego
+con `gp_crear_particulas(tipo=TU_PREFAB)`. `gp_nieve()` y `gp_lluvia()`
+son, por dentro, exactamente eso: dos prefabs que ya vienen armados con
+el módulo.
+
+**Importante: tus propios prefabs NO van dentro del archivo del
+módulo** (`modulo_gestor_particulas.rpy`). Se guardan en un archivo
+`.rpy` **aparte**, en cualquier otro lugar de tu carpeta `game/`. Por
+ejemplo, uno tuyo llamado `prefab_particulas.rpy`, junto a tu
+`script.rpy`:
+
+```
+tu_proyecto/
+└── game/
+    ├── modulos/
+    │   └── gestor_particulas/       <- el módulo: no lo edites
+    │       ├── modulo_gestor_particulas.rpy
+    │       └── README.md
+    ├── prefab_particulas.rpy        <- tus prefabs, en tu propio archivo
+    └── script.rpy
+```
+
+¿Por qué conviene un archivo aparte, con TODOS tus prefabs juntos, en
+vez de escribirlos sueltos donde los vayas necesitando? Por dos
+motivos:
+
+- **El módulo queda intacto.** Está pensado para copiarse y pegarse tal
+  cual entre proyectos (o reemplazarse por una versión más nueva el día
+  de mañana) sin arrastrar contenido específico de tu juego. Si guardás
+  tus prefabs en su propio archivo, podés actualizar o volver a copiar
+  la carpeta `gestor_particulas/` sin miedo a perder nada tuyo, porque
+  nunca la tocaste.
+
+- **El guión de tu novela visual queda limpio.** Si cada vez que
+  necesitás un efecto escribís `gp_crear_particulas(...)` con quince
+  parámetros directamente en medio de un label, tu `script.rpy` (o el
+  capítulo que estés escribiendo) se llena de números y configuración
+  que no tienen nada que ver con la historia, y se vuelve más difícil
+  de leer. Definiendo cada efecto UNA vez como prefab, en su propio
+  archivo, el guión de la historia queda enfocado en la historia: en
+  el label solo aparece un `gp_crear_particulas(tipo=PREFAB_LLUVIA)`,
+  una línea corta y fácil de entender de un vistazo, sin tener que
+  bucear entre parámetros para saber qué está pasando en esa escena.
+  Además, si más adelante querés ajustar cómo se ve la lluvia en TODO
+  el juego, lo cambiás en un solo lugar (el prefab) en vez de buscar y
+  editar cada label donde la usaste.
+
+Ren'Py no necesita que le digas nada especial para que ese archivo se
+cargue: como pasa con cualquier `.rpy` dentro de `game/`, se carga solo,
+sin importar el nombre que le pongas ni en qué subcarpeta esté. Lo único
+que importa es que se cargue DESPUÉS del módulo — y eso también pasa
+solo, porque Ren'Py carga primero por orden alfabético de carpeta y acá
+`modulos/` va antes que un archivo suelto en `game/`. Si igual preferís
+ordenarlo distinto (por ejemplo, un prefab por capítulo del juego,
+dentro de una carpeta `game/particulas/`), también funciona igual.
+
+**Ejemplo de `prefab_particulas.rpy`**, con tres prefabs propios:
+
+```renpy
+# prefab_particulas.rpy
+# Prefabs de partículas propios de este juego. Este archivo NO es parte
+# del módulo "gestor_particulas": es tuyo, y podés editarlo, renombrarlo
+# o borrar prefabs sin afectar al módulo en absoluto.
+
+define PREFAB_HOJAS = GP_TipoParticula(
+    imagenes=["imagenes/hoja1.png", "imagenes/hoja2.png"],
+    tamano_min=16, tamano_max=28,
+    cantidad=40,
+    angulo_base=100, angulo_variacion=25,
+    velocidad_min=40, velocidad_max=90,
+    ondulado=True, amplitud_ondulado=40, frecuencia_ondulado=0.4,
+    rotar=True, rotacion_velocidad_min=-90, rotacion_velocidad_max=90,
+    opacidad_min=0.7, opacidad_max=1.0,
+)
+
+define PREFAB_CHISPAS = GP_TipoParticula(
+    color=["#FFCC66", "#FF9933", "#FF6600"],
+    forma="circulo",
+    tamano_min=2, tamano_max=5,
+    cantidad=25,
+    angulo_base=270, angulo_variacion=30,
+    velocidad_min=30, velocidad_max=70,
+    origen="abajo", origen_min=0.4, origen_max=0.6,
+    opacidad_min=0.4, opacidad_max=0.9,
+    tiempo_vida_min=0.8, tiempo_vida_max=1.6,
+)
+
+define PREFAB_POLVO_MAGICO = GP_TipoParticula(
+    color=["#E0AAFF", "#C77DFF", "#FFFFFF"],
+    forma="circulo",
+    tamano_min=1, tamano_max=3,
+    cantidad=35,
+    angulo_base=270, angulo_variacion=180,
+    velocidad_min=10, velocidad_max=35,
+    origen="toda_pantalla",
+    opacidad_min=0.3, opacidad_max=0.8,
+    tiempo_vida_min=1.0, tiempo_vida_max=2.5,
+)
+```
+
+Y despues, en `script.rpy` (o en cualquier otro label), los usás igual
+que a `gp_nieve()` o `gp_lluvia()`, pasándoselos a
+`gp_crear_particulas()` con `tipo=...`:
+
+```renpy
+label bosque_otonal:
+    scene bg bosque
+    $ id_hojas = gp_crear_particulas(tipo=PREFAB_HOJAS)
+    e "Las hojas caen sin parar por acá."
+    ...
+    $ gp_terminar_particulas(id_hojas)
+
+label cueva_magica:
+    scene bg cueva
+    $ id_polvo = gp_crear_particulas(tipo=PREFAB_POLVO_MAGICO)
+    e "Este lugar brilla solo..."
+    ...
+    $ gp_terminar_particulas(id_polvo)
+```
+
+> **Tip de nombres:** evitá que tus propios prefabs empiecen con `GP_`
+> (ese prefijo lo usa el módulo para sus propios nombres internos, como
+> `GP_NIEVE` o `GP_TipoParticula`). Usar otro prefijo propio — en el
+> ejemplo de arriba, `PREFAB_` — evita cualquier confusión o choque de
+> nombres, y además deja bien claro, con solo mirar el nombre, que es
+> algo tuyo y no parte del módulo.
+
+Esto es exactamente lo mismo que hacen, por dentro, `gp_nieve()` y
+`gp_lluvia()`: son atajos que arman un `GP_TipoParticula` a partir de la
+sección "CONFIGURACION" (esos sí viven dentro del módulo, porque son
+parte de lo que el módulo ofrece de fábrica) y se lo pasan a
+`gp_crear_particulas()`. Incluso podés ajustarles algún parámetro
+puntual sin tocar la configuración general, por ejemplo
+`gp_nieve(cantidad=150)` para una nevada más densa solo en una escena
+puntual.
+
+La lista completa de parámetros disponibles para `gp_crear_particulas()`
+(con la explicación de cada uno en español) está en el docstring de la
+clase `GP_TipoParticula`, dentro de `modulo_gestor_particulas.rpy`, en
+la sección "MOTOR". Ahí también podés ver `origen`,
+`origen_min`/`origen_max`, `ancho_min`/`ancho_max` y `zorder`, que no
+hicieron falta en los ejemplos de arriba pero están disponibles para
+casos más específicos.
+
+## Notas de rendimiento
+
+Ren'Py mueve las partículas con Python "a mano", cuadro a cuadro: no hay
+forma de que esto lo acelere la placa de video (GPU), todo el trabajo
+lo hace el procesador (CPU). Por eso `cantidad` es el parámetro que más
+impacta en el rendimiento, y conviene tenerlo en cuenta:
+
+- **Color plano (`imagenes=None`), que es lo que usan nieve y lluvia
+  por defecto:** es la opción más liviana, porque cada partícula se
+  dibuja con una sola instrucción directa (un círculo o un rectángulo),
+  sin pasar por el sistema de imágenes de Ren'Py. En una PC de gama
+  media hoy en día, andar con 200-400 partículas de este tipo al mismo
+  tiempo no debería notarse. En celulares o PCs más limitadas, convine
+  quedarse más cerca de 80-150.
+- **Con `imagenes`:** cada partícula se escala (y, si `rotar=True`, se
+  rota) como una imagen aparte en cada cuadro, pasando por el sistema
+  de renderizado completo de Ren'Py — mucho más costoso que dibujar un
+  color plano. Con imágenes conviene quedarse en un rango más chico,
+  como 60-120 partículas, sobre todo si además rotan.
+- Si necesitás un efecto muy denso y notás que se pone lento, primero
+  probá bajar `cantidad` antes que cualquier otro parámetro: es el que
+  tiene el impacto más directo en el rendimiento. Combinar varios
+  efectos activos al mismo tiempo (por ejemplo nieve + niebla + polvo)
+  también suma: la cantidad total de partículas en pantalla es lo que
+  importa, sin importar en cuántos `gp_crear_particulas()` distintos
+  estén repartidas.
+- El módulo ya evita todo el trabajo que se pueda calcular una sola vez
+  por partícula (por ejemplo, el color exacto con su transparencia) en
+  vez de recalcularlo en cada cuadro, así que no hace falta que hagas
+  nada extra para aprovechar eso: viene optimizado así desde la propia
+  función que crea cada partícula.
+
+## Compatibilidad y licencia
+
+- Compatible con Ren'Py 7.x y 8.x.
+- Uso libre para la comunidad hispanohablante de Ren'Py: podés copiar,
+  modificar y redistribuir este módulo sin necesidad de dar crédito.
