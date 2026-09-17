@@ -50,3 +50,4 @@ Desktop.ini
 # --- Configuración local de editores de código (opcional) ---
 .vscode/
 .idea/
+*-session.tmp
