@@ -14,6 +14,7 @@ un canal de YouTube dedicado a enseñar Ren'Py. 💜
 | Módulo | Qué hace |
 |---|---|
 | [Efecto Máquina de Escribir](libreria/game/modulos/efecto_maquina_de_escribir/README.md) | El texto de los diálogos aparece letra por letra, con un sonido de tecleo opcional y configurable. |
+| [Gestor de Partículas](libreria/game/modulos/gestor_particulas/README.md) | Efectos de partículas en pantalla (nieve, lluvia y cualquier efecto propio), con color plano o imagen, totalmente configurables: ángulo, velocidad, tamaño, rotación, etc. |
 
 *(A medida que se agreguen más módulos, van a aparecer acá.)*
 
@@ -32,9 +33,12 @@ un canal de YouTube dedicado a enseñar Ren'Py. 💜
 libreria/                          <- proyecto de Ren'Py (podés abrirlo con el Launcher)
 └── game/
     └── modulos/
-        └── efecto_maquina_de_escribir/   <- un módulo, autocontenido en su carpeta
-            ├── modulo_efecto_maquina_de_escribir.rpy
-            ├── audio/
+        ├── efecto_maquina_de_escribir/   <- un módulo, autocontenido en su carpeta
+        │   ├── modulo_efecto_maquina_de_escribir.rpy
+        │   ├── audio/
+        │   └── README.md
+        └── gestor_particulas/            <- otro módulo, autocontenido en su carpeta
+            ├── modulo_gestor_particulas.rpy
             └── README.md
 ```
 
