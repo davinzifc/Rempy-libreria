@@ -24,16 +24,20 @@ parámetros de configuración.
 
 ```
 gestor_particulas/
-├── modulo_gestor_particulas.rpy   <- el módulo en sí (motor + nieve y lluvia)
+├── modulo_gestor_particulas.rpy   <- el módulo en sí (motor + nieve, lluvia y luciérnagas)
+├── imagenes/
+│   ├── luz.png                    <- círculo con brillo suave (nieve y luciérnagas)
+│   └── gota.png                   <- estela de lluvia
 └── README.md                      <- este archivo
 ```
 
-Este módulo no necesita ningún archivo de imagen ni de sonido para
-funcionar: los efectos de nieve y lluvia que trae por defecto se dibujan
-solos, como figuras de color plano. Si más adelante querés usar tus
-propias imágenes (por ejemplo, un copo de nieve dibujado), simplemente
-las copiás dentro de la carpeta `game/` de tu proyecto y apuntás a esa
-ruta desde la configuración (ver más abajo).
+Las dos imágenes de `imagenes/` son las que usan los efectos ya armados
+(nieve, lluvia y luciérnagas). Si más adelante querés usar tus propias
+imágenes, copialas dentro de la carpeta `game/` de tu proyecto (fuera de
+la carpeta del módulo, así no se mezclan) y apuntá a esa ruta.
+Si ponés `GP_NIEVE_IMAGENES` y `GP_LLUVIA_IMAGENES` en `None`, esos dos
+efectos se dibujan con figuras de color plano y no necesitan ninguna
+imagen.
 
 ## Cómo instalarlo
 
@@ -50,6 +54,9 @@ ruta desde la configuración (ver más abajo).
        └── modulos/
            └── gestor_particulas/
                ├── modulo_gestor_particulas.rpy
+               ├── imagenes/
+               │   ├── luz.png
+               │   └── gota.png
                └── README.md
    ```
 
@@ -182,13 +189,13 @@ quisieras, por ejemplo, chispas que suben desde una fogata, usarías un
 ### Usar tus propias imágenes en vez de color plano
 
 1. Copiá tu imagen (por ejemplo `copo.png`) dentro de la carpeta
-   `game/` de tu proyecto. Podés crear una carpeta
-   `game/modulos/gestor_particulas/imagenes/` para ordenarla.
+   `game/` de tu proyecto, en tu propia carpeta de imágenes (por
+   ejemplo `game/imagenes/`), fuera de la carpeta del módulo.
 2. Cambiá `GP_NIEVE_IMAGENES` (o `GP_LLUVIA_IMAGENES`) para que apunte a
    esa ruta:
 
    ```renpy
-   define GP_NIEVE_IMAGENES = ["modulos/gestor_particulas/imagenes/copo.png"]
+   define GP_NIEVE_IMAGENES = ["imagenes/copo.png"]
    ```
 
 3. Si le pasás más de una imagen en la lista, cada partícula elige una
@@ -396,6 +403,87 @@ la sección "MOTOR". Ahí también podés ver `origen`,
 `origen_min`/`origen_max`, `ancho_min`/`ancho_max` y `zorder`, que no
 hicieron falta en los ejemplos de arriba pero están disponibles para
 casos más específicos.
+
+## Efectos ya armados: nieve, lluvia y luciérnagas
+
+Los tres vienen con imágenes de bordes suaves (sin el pixelado de los
+círculos planos), guardadas en la carpeta `imagenes/` del módulo:
+
+| Efecto | Atajo | Imagen por defecto |
+|---|---|---|
+| Nieve | `gp_nieve()` | `luz.png` (círculo blanco con brillo suave) |
+| Lluvia | `gp_lluvia()` | `gota.png` (estela celeste inclinada ~10°) |
+| Luciérnagas | `gp_luciernagas()` | `luz.png`, teñida con `GP_LUCIERNAGAS_COLORES` |
+
+Cada uno se ajusta con sus variables `GP_NIEVE_*`, `GP_LLUVIA_*` y
+`GP_LUCIERNAGAS_*` de la sección "CONFIGURACION". Para volver a formas
+planas (más livianas) poné `GP_NIEVE_IMAGENES` / `GP_LLUVIA_IMAGENES` en
+`None`, y de paso volvé el tamaño de la nieve a 3–8.
+
+Las imágenes que se tiñen (como la luz de las luciérnagas) tienen que ser
+**blancas sobre transparente**: el módulo las pinta con cada color de la
+lista.
+
+## Configurar solo lo que quieras cambiar
+
+No hace falta pasar parámetros en orden ni escribir `None` en los que no
+querés tocar: todo parámetro tiene un valor por defecto y se indica por
+nombre (`nombre=valor`), así que solo escribís lo que te interesa:
+
+```renpy
+$ id = gp_crear_particulas(color="#FFFF88", tiempo_vida=4, fade_in=1)
+```
+
+Sirve también para ajustar nieve, lluvia, luciérnagas o un prefab ya
+armado:
+
+```renpy
+$ id = gp_nieve(cantidad=40)
+$ id = gp_crear_particulas(tipo=PREFAB_HOJAS, cantidad=20)
+```
+
+Un parámetro mal escrito da un error claro en vez de ignorarse en
+silencio.
+
+## Tiempo de vida y fade (aparición/desaparición suave)
+
+| Parámetro | Para qué sirve |
+|---|---|
+| `tiempo_vida` | Cuántos segundos vive cada partícula (atajo de `tiempo_vida_min` = `tiempo_vida_max`). Pasado ese tiempo, reaparece en otro lugar. |
+| `tiempo_vida_min` / `tiempo_vida_max` | Lo mismo, pero con un rango al azar por partícula. |
+| `fade_in` | Segundos que tarda en aparecer (opacidad de 0 a su valor). |
+| `fade_out` | Segundos que tarda en apagarse al final de su vida. Necesita `tiempo_vida`. |
+
+La partícula queda con opacidad completa entre el fade in y el fade out.
+Si `fade_in + fade_out` es más largo que la vida, se acortan
+proporcionalmente. Al arrancar el efecto, cada partícula empieza en un
+punto distinto de su ciclo, así no parpadean todas a la vez.
+
+## Movimiento aleatorio (luciérnagas, polvo, burbujas)
+
+Con `movimiento="aleatorio"` las partículas **vagan por toda la
+pantalla**: cambian de rumbo suavemente al azar y rebotan en los bordes
+(nunca salen). Nacen en cualquier punto de la pantalla.
+`vagar_giro` (grados por segundo) controla qué tan bruscos son los giros:
+20-40 = curvas suaves, 120+ = nervioso. `velocidad_min/max` fija qué tan
+rápido andan.
+
+**Ejemplo: luciérnagas**
+
+```renpy
+define PREFAB_LUCIERNAGAS = GP_TipoParticula(
+    color=["#F5FF7A", "#CFFF5E"], forma="circulo",
+    tamano_min=3, tamano_max=6, cantidad=30,
+    movimiento="aleatorio", vagar_giro=50,
+    angulo_variacion=180,
+    velocidad_min=15, velocidad_max=40,
+    opacidad_min=0.7, opacidad_max=1.0,
+    tiempo_vida_min=4, tiempo_vida_max=8,
+    fade_in=1.5, fade_out=1.5,
+)
+```
+
+Sin `tiempo_vida`, las partículas vagan para siempre sin apagarse.
 
 ## Notas de rendimiento
 
