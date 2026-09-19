@@ -2,9 +2,11 @@
 #  MODULO: GESTOR DE PARTICULAS (NIEVE, LLUVIA Y EFECTOS PERSONALIZADOS)
 #  Version: 1.0
 #  Compatibilidad: Ren'Py 7.x / 8.x
-#  Licencia: Uso libre para la comunidad hispanohablante de Ren'Py.
-#            Puedes copiar, modificar y redistribuir este archivo sin
-#            necesidad de dar credito.
+#  Licencia: MIT. Copyright (c) 2026 davinzifc.
+#            Puedes usar, copiar, modificar y redistribuir este archivo,
+#            siempre que mantengas este aviso de copyright y la licencia
+#            MIT (ver el archivo LICENSE del repositorio) en las copias.
+#            Es decir: hay que dar credito al desarrollador.
 #
 #  Para instrucciones de instalacion, ejemplos de uso dentro del guion y
 #  mas detalles, abri el archivo "README.md" que viene junto a este
@@ -50,19 +52,21 @@ define GP_NIEVE_CANTIDAD = 150
 # mas abajo). Solo se usa si GP_NIEVE_IMAGENES esta en None.
 define GP_NIEVE_COLOR = "#FFFFFF"
 
-# Lista de imagenes a usar como copos de nieve, por ejemplo:
-#     define GP_NIEVE_IMAGENES = ["modulos/gestor_particulas/imagenes/copo.png"]
-# Si le pasas mas de una imagen, cada copo elige una al azar. Dejalo en
-# None para no usar imagenes: en ese caso los copos se dibujan solos,
-# como circulos planos del color de arriba (no hace falta ningun archivo
-# de imagen para que la nieve funcione).
-define GP_NIEVE_IMAGENES = None
+# Lista de imagenes a usar como copos de nieve. Por defecto es "luz.png",
+# un circulo blanco con brillo suave y bordes sin pixelar (viene en la
+# carpeta "imagenes" del modulo). Si le pasas mas de una imagen, cada
+# copo elige una al azar. Dejalo en None para no usar imagenes: en ese
+# caso los copos se dibujan solos, como circulos planos del color de
+# arriba (mas livianos, pero con bordes pixelados).
+define GP_NIEVE_IMAGENES = ["modulos/gestor_particulas/imagenes/luz.png"]
 
 # Rango de tamanio de cada copo, en pixeles (de mas chico a mas grande).
 # Cada copo elige un tamanio al azar dentro de este rango. Si queres que
 # todos midan exactamente lo mismo, poné el mismo numero en los dos.
-define GP_NIEVE_TAMANO_MIN = 3
-define GP_NIEVE_TAMANO_MAX = 8
+# (Con la imagen "luz.png" el tamanio incluye el halo, por eso es mayor
+# que el de un circulo plano; con imagenes=None usa 3 y 8.)
+define GP_NIEVE_TAMANO_MIN = 8
+define GP_NIEVE_TAMANO_MAX = 20
 
 # Angulo de caida, en grados. Sirve para indicar hacia donde "sale" la
 # particula:
@@ -128,17 +132,20 @@ define GP_LLUVIA_CANTIDAD = 140
 # cualquier fondo. Solo se usa si GP_LLUVIA_IMAGENES esta en None.
 define GP_LLUVIA_COLOR = "#9FC6FF"
 
-# Lista de imagenes para la gota (igual que en la nieve). Dejalo en None
-# para que la gota se dibuje sola, como un rectangulo (raya) plana del
-# color de arriba: es la forma mas comun de representar lluvia y no
-# necesita ningun archivo de imagen.
-define GP_LLUVIA_IMAGENES = None
+# Lista de imagenes para la gota (igual que en la nieve). Por defecto es
+# "gota.png": una estela celeste con bordes suaves, ya inclinada unos 10
+# grados (calza con GP_LLUVIA_ANGULO_BASE = 100). Si cambias mucho el
+# angulo de la lluvia, usa otra imagen con la inclinacion que quieras.
+# Dejalo en None para que la gota se dibuje sola, como un rectangulo
+# plano del color de arriba (mas liviano, pero sin suavizado).
+define GP_LLUVIA_IMAGENES = ["modulos/gestor_particulas/imagenes/gota.png"]
 
 # Forma de la particula cuando NO se usa imagen: "circulo" o "rectangulo".
 # Para lluvia, "rectangulo" da el clasico efecto de rayas cayendo.
 define GP_LLUVIA_FORMA = "rectangulo"
 
-# Rango de largo de cada gota (alto del rectangulo), en pixeles.
+# Rango de largo de cada gota (lado mas largo de la imagen, o alto del
+# rectangulo si no se usa imagen), en pixeles.
 define GP_LLUVIA_TAMANO_MIN = 14
 define GP_LLUVIA_TAMANO_MAX = 26
 
@@ -165,6 +172,50 @@ define GP_LLUVIA_OPACIDAD_MAX = 0.7
 
 # Orden de dibujado (ver la explicacion en la seccion de la nieve).
 define GP_LLUVIA_ZORDER = -10
+
+
+# ----------------------------------------------------------------------------
+# --- EFECTO "LUCIERNAGAS" -----------------------------------------------------
+# ----------------------------------------------------------------------------
+
+# Cuantas luciernagas hay en pantalla al mismo tiempo.
+define GP_LUCIERNAGAS_CANTIDAD = 30
+
+# Imagen de cada luz. Por defecto "luz.png" (circulo con brillo suave).
+# La imagen viene en blanco: se tine con los colores de la lista de abajo.
+define GP_LUCIERNAGAS_IMAGENES = ["modulos/gestor_particulas/imagenes/luz.png"]
+
+# Colores con los que se tine cada luz, en formato "#RRGGBB". Cada
+# luciernaga elige uno al azar. Dejalo en None para usar la imagen tal
+# cual (blanca), o si tu imagen ya tiene el color que queres.
+define GP_LUCIERNAGAS_COLORES = ["#F5FF7A", "#CFFF5E", "#FFF1A8"]
+
+# Rango de tamanio de cada luz, en pixeles (incluye el halo).
+define GP_LUCIERNAGAS_TAMANO_MIN = 22
+define GP_LUCIERNAGAS_TAMANO_MAX = 42
+
+# Rango de velocidad, en pixeles por segundo, y que tan bruscamente
+# cambian de rumbo (grados por segundo: 20-40 curvas suaves, 120+
+# nervioso). Las luciernagas vagan por toda la pantalla y rebotan en
+# los bordes.
+define GP_LUCIERNAGAS_VELOCIDAD_MIN = 15
+define GP_LUCIERNAGAS_VELOCIDAD_MAX = 40
+define GP_LUCIERNAGAS_VAGAR_GIRO = 50
+
+# Rango de opacidad de cada luz (0.0 = invisible, 1.0 = solida).
+define GP_LUCIERNAGAS_OPACIDAD_MIN = 0.7
+define GP_LUCIERNAGAS_OPACIDAD_MAX = 1.0
+
+# Cuanto dura prendida cada luciernaga (segundos, rango al azar) y cuanto
+# tardan en encenderse y apagarse suavemente (fade). Al terminar su vida
+# reaparecen en otro lugar.
+define GP_LUCIERNAGAS_VIDA_MIN = 3
+define GP_LUCIERNAGAS_VIDA_MAX = 6
+define GP_LUCIERNAGAS_FADE_IN = 1.0
+define GP_LUCIERNAGAS_FADE_OUT = 1.0
+
+# Orden de dibujado (ver la explicacion en la seccion de la nieve).
+define GP_LUCIERNAGAS_ZORDER = -10
 
 
 # ============================================================================
@@ -285,6 +336,37 @@ init python:
                 efectos que no dependen de "caer", como chispas que se
                 apagan solas).
 
+            tiempo_vida (segundos o None):
+                Atajo: fija la vida exacta de cada particula (equivale a
+                poner el mismo numero en tiempo_vida_min y
+                tiempo_vida_max).
+
+            fade_in, fade_out (segundos):
+                Aparicion y desaparicion suaves: durante "fade_in"
+                segundos la opacidad sube de 0 hasta su valor, y durante
+                los ultimos "fade_out" segundos baja hasta 0. Asi la
+                particula nunca "salta" de la nada, como una luciernaga
+                que se prende y se apaga. La particula queda prendida
+                (opacidad completa) el resto de su vida. "fade_out"
+                necesita que haya tiempo de vida; si fade_in + fade_out
+                es mas largo que la vida, se achican proporcionalmente.
+                Por defecto es 0 (sin fade).
+
+            movimiento ("lineal" o "aleatorio"):
+                "lineal" (por defecto): la particula viaja en linea
+                recta segun angulo y velocidad (nieve, lluvia).
+                "aleatorio": la particula vaga por toda la pantalla,
+                cambiando de rumbo suavemente al azar, y rebota en los
+                bordes en vez de salir (luciernagas, polvo, burbujas).
+                En este modo las particulas nacen en cualquier parte de
+                la pantalla; "angulo_base" solo define el rumbo inicial
+                (con angulo_variacion=180 sale en cualquier direccion).
+
+            vagar_giro (grados por segundo):
+                Solo con movimiento="aleatorio": que tan brusco cambia
+                de rumbo. Numeros chicos (20-40) = curvas suaves y
+                lentas; grandes (120+) = movimiento nervioso.
+
             zorder (int):
                 Orden de dibujado del efecto dentro de su capa. Ver
                 gp_crear_particulas() para mas detalle.
@@ -317,6 +399,11 @@ init python:
             origen_max=1.0,
             tiempo_vida_min=None,
             tiempo_vida_max=None,
+            tiempo_vida=None,
+            fade_in=0.0,
+            fade_out=0.0,
+            movimiento="lineal",
+            vagar_giro=60,
             zorder=-10,
         ):
 
@@ -325,6 +412,23 @@ init python:
 
             if origen not in ("auto", "arriba", "abajo", "izquierda", "derecha", "toda_pantalla"):
                 raise Exception("GP_TipoParticula: 'origen' invalido: %r" % (origen,))
+
+            if movimiento not in ("lineal", "aleatorio"):
+                raise Exception("GP_TipoParticula: 'movimiento' tiene que ser 'lineal' o 'aleatorio' (recibido: %r)" % (movimiento,))
+
+            if tiempo_vida is not None:
+                tiempo_vida_min = tiempo_vida
+                tiempo_vida_max = tiempo_vida
+            # Si se da solo uno de los dos extremos, el otro lo iguala.
+            if tiempo_vida_min is None and tiempo_vida_max is not None:
+                tiempo_vida_min = tiempo_vida_max
+            elif tiempo_vida_max is None and tiempo_vida_min is not None:
+                tiempo_vida_max = tiempo_vida_min
+
+            if fade_out > 0 and tiempo_vida_max is None:
+                raise Exception("GP_TipoParticula: 'fade_out' necesita que definas tiempo_vida (o tiempo_vida_min/max)")
+            if fade_in < 0 or fade_out < 0:
+                raise Exception("GP_TipoParticula: 'fade_in' y 'fade_out' no pueden ser negativos")
 
             self.imagenes = imagenes
             self.color = color
@@ -351,6 +455,10 @@ init python:
             self.origen_max = origen_max
             self.tiempo_vida_min = tiempo_vida_min
             self.tiempo_vida_max = tiempo_vida_max
+            self.fade_in = fade_in
+            self.fade_out = fade_out
+            self.movimiento = movimiento
+            self.vagar_giro = vagar_giro
             self.zorder = zorder
 
     def _gp_color_a_rgba(color_hex, opacidad):
@@ -416,7 +524,8 @@ init python:
             vx = _gp_math.cos(angulo) * velocidad
             vy = _gp_math.sin(angulo) * velocidad
 
-            origen = self._elegir_origen(vx, vy)
+            vagando = tipo.movimiento == "aleatorio"
+            origen = "toda_pantalla" if vagando else self._elegir_origen(vx, vy)
             margen = tamano + ancho_particula
 
             if dispersar and origen != "toda_pantalla":
@@ -461,6 +570,13 @@ init python:
 
             opacidad = _gp_random.uniform(tipo.opacidad_min, tipo.opacidad_max)
 
+            nacimiento = st
+            if vida is not None and dispersar:
+                # Al arrancar el efecto, cada particula empieza en un
+                # punto distinto de su ciclo de vida, para que no se
+                # prendan y apaguen todas sincronizadas.
+                nacimiento = st - _gp_random.uniform(0, vida)
+
             # El color final (en RGBA) y las medidas en pixeles enteros
             # se calculan aca, UNA sola vez por particula, en vez de
             # recalcularlos en cada cuadro dentro de render(): con
@@ -499,8 +615,10 @@ init python:
                     if tipo.rotar else 0.0
                 ),
                 "fase_ondulado": _gp_random.uniform(0, 2 * _gp_math.pi),
-                "nacimiento": st,
+                "nacimiento": nacimiento,
                 "vida": vida,
+                "angulo": angulo,
+                "velocidad": velocidad,
             }
 
         def render(self, width, height, st, at):
@@ -546,12 +664,40 @@ init python:
             amplitud_ondulado = tipo.amplitud_ondulado
             forma_rectangulo = tipo.forma == "rectangulo"
             imagenes_info = self.imagenes_info
+            vagando = tipo.movimiento == "aleatorio"
+            giro_rad = _gp_math.radians(tipo.vagar_giro) * _gp_math.sqrt(dt) if dt > 0 else 0.0
+            fade_in = tipo.fade_in
+            fade_out = tipo.fade_out
+            hay_fade = fade_in > 0 or fade_out > 0
 
             for indice in range(len(particulas)):
                 p = particulas[indice]
 
+                if vagando:
+                    # Caminata aleatoria suave: el rumbo se desvia un poco
+                    # al azar en cada cuadro, sin saltos bruscos.
+                    p["angulo"] += _gp_random.gauss(0.0, giro_rad)
+                    p["vx"] = _gp_math.cos(p["angulo"]) * p["velocidad"]
+                    p["vy"] = _gp_math.sin(p["angulo"]) * p["velocidad"]
+
                 p["x"] += p["vx"] * dt
                 p["y"] += p["vy"] * dt
+
+                if vagando:
+                    # Rebota en los bordes: la particula nunca sale.
+                    if p["x"] < 0:
+                        p["x"] = 0.0
+                        p["angulo"] = _gp_math.pi - p["angulo"]
+                    elif p["x"] > width:
+                        p["x"] = float(width)
+                        p["angulo"] = _gp_math.pi - p["angulo"]
+                    if p["y"] < 0:
+                        p["y"] = 0.0
+                        p["angulo"] = -p["angulo"]
+                    elif p["y"] > height:
+                        p["y"] = float(height)
+                        p["angulo"] = -p["angulo"]
+
                 if rotar:
                     p["rotacion"] = (p["rotacion"] + p["velocidad_rotacion"] * dt) % 360.0
 
@@ -570,25 +716,61 @@ init python:
                     fase = st * frecuencia_ondulado * 2 * _gp_math.pi + p["fase_ondulado"]
                     x_dibujo += _gp_math.sin(fase) * amplitud_ondulado
 
+                # Factor de fade (0.0 a 1.0): sube al nacer y baja al
+                # final de la vida, para que aparezca/desaparezca suave.
+                factor = 1.0
+                if hay_fade:
+                    edad = st - p["nacimiento"]
+                    vida = p["vida"]
+                    f_in = fade_in
+                    f_out = fade_out if vida is not None else 0.0
+                    if vida is not None and f_in + f_out > vida:
+                        escala_fade = vida / (f_in + f_out)
+                        f_in *= escala_fade
+                        f_out *= escala_fade
+                    if f_in > 0 and edad < f_in:
+                        factor = max(0.0, edad / f_in)
+                    if f_out > 0 and vida is not None and edad > vida - f_out:
+                        factor = min(factor, max(0.0, (vida - edad) / f_out))
+
                 imagen_indice = p["imagen_indice"]
                 if imagen_indice is not None:
                     disp, _aw, _ah = imagenes_info[imagen_indice]
-                    transformada = Transform(disp, zoom=p["escala"], rotate=p["rotacion"], alpha=p["opacidad"])
+                    transformada = Transform(disp, zoom=p["escala"], rotate=p["rotacion"], alpha=p["opacidad"] * factor)
                     render_hijo = renpy.render(transformada, width, height, st, at)
                     hw, hh = render_hijo.width, render_hijo.height
                     r.blit(render_hijo, (x_dibujo - hw / 2.0, p["y"] - hh / 2.0))
-                elif forma_rectangulo:
-                    aw = p["ancho_px"]
-                    ah = p["tamano_px"]
-                    lienzo.rect(p["color_rgba"], (int(x_dibujo - aw / 2.0), int(p["y"] - ah / 2.0), aw, ah))
                 else:
-                    lienzo.circle(p["color_rgba"], (int(x_dibujo), int(p["y"])), p["radio_px"])
+                    rgba = p["color_rgba"]
+                    if factor < 1.0:
+                        rgba = (rgba[0], rgba[1], rgba[2], int(rgba[3] * factor))
+                    if forma_rectangulo:
+                        aw = p["ancho_px"]
+                        ah = p["tamano_px"]
+                        lienzo.rect(rgba, (int(x_dibujo - aw / 2.0), int(p["y"] - ah / 2.0), aw, ah))
+                    else:
+                        lienzo.circle(rgba, (int(x_dibujo), int(p["y"])), p["radio_px"])
 
             # Vuelve a pedir un cuadro nuevo lo antes posible, para que
             # la animacion sea continua.
             renpy.redraw(self, 0)
 
             return r
+
+    def _gp_imagenes_tenidas(rutas, colores):
+        """
+        Devuelve la lista de imagenes lista para pasar a "imagenes": si
+        hay "colores", una version de cada imagen tenida de cada color
+        (la imagen original debe ser blanca); si "colores" es None, las
+        rutas tal cual.
+        """
+        if not rutas or not colores:
+            return rutas
+        return [
+            im.MatrixColor(ruta, im.matrix.colorize(color, color))
+            for ruta in rutas
+            for color in colores
+        ]
 
     # "Recetas" de nieve y lluvia ya armadas, a partir de las variables
     # de la seccion "CONFIGURACION", arriba del todo de este archivo.
@@ -631,6 +813,25 @@ init python:
         opacidad_min=GP_LLUVIA_OPACIDAD_MIN,
         opacidad_max=GP_LLUVIA_OPACIDAD_MAX,
         zorder=GP_LLUVIA_ZORDER,
+    )
+
+    GP_LUCIERNAGAS = GP_TipoParticula(
+        imagenes=_gp_imagenes_tenidas(GP_LUCIERNAGAS_IMAGENES, GP_LUCIERNAGAS_COLORES),
+        tamano_min=GP_LUCIERNAGAS_TAMANO_MIN,
+        tamano_max=GP_LUCIERNAGAS_TAMANO_MAX,
+        cantidad=GP_LUCIERNAGAS_CANTIDAD,
+        angulo_variacion=180,
+        velocidad_min=GP_LUCIERNAGAS_VELOCIDAD_MIN,
+        velocidad_max=GP_LUCIERNAGAS_VELOCIDAD_MAX,
+        movimiento="aleatorio",
+        vagar_giro=GP_LUCIERNAGAS_VAGAR_GIRO,
+        opacidad_min=GP_LUCIERNAGAS_OPACIDAD_MIN,
+        opacidad_max=GP_LUCIERNAGAS_OPACIDAD_MAX,
+        tiempo_vida_min=GP_LUCIERNAGAS_VIDA_MIN,
+        tiempo_vida_max=GP_LUCIERNAGAS_VIDA_MAX,
+        fade_in=GP_LUCIERNAGAS_FADE_IN,
+        fade_out=GP_LUCIERNAGAS_FADE_OUT,
+        zorder=GP_LUCIERNAGAS_ZORDER,
     )
 
     # Capa por defecto en la que se muestran los efectos. Se usa
@@ -685,10 +886,10 @@ init python:
 
             tipo (GP_TipoParticula o None):
                 Si ya tenes armado un GP_TipoParticula de antes (por
-                ejemplo, uno que queres reutilizar varias veces sin
-                escribir todos sus parametros cada vez), se lo podes
-                pasar directamente con tipo=...: en ese caso se ignora
-                cualquier otro parametro.
+                ejemplo, uno que queres reutilizar varias veces), se lo
+                podes pasar con tipo=...; los parametros con nombre que
+                agregues se aplican encima como ajustes puntuales.
+                Todo lo que no pongas queda con su valor por defecto.
 
             capa (str o None):
                 En que capa se muestra el efecto. Si se deja en None,
@@ -696,6 +897,8 @@ init python:
         """
         if tipo is None:
             tipo = GP_TipoParticula(**parametros)
+        elif parametros:
+            tipo = _gp_tipo_con_cambios(tipo, parametros)
 
         if capa is None:
             capa = GP_CAPA_POR_DEFECTO
@@ -756,8 +959,17 @@ init python:
         if not cambios:
             return tipo_base
         nuevo = _gp_copy.copy(tipo_base)
+        cambios = dict(cambios)
+        if "tiempo_vida" in cambios:
+            valor = cambios.pop("tiempo_vida")
+            cambios["tiempo_vida_min"] = valor
+            cambios["tiempo_vida_max"] = valor
         for clave, valor in cambios.items():
+            if not hasattr(nuevo, clave):
+                raise Exception("Parametro de particulas desconocido: %r" % (clave,))
             setattr(nuevo, clave, valor)
+        if nuevo.fade_out > 0 and nuevo.tiempo_vida_max is None:
+            raise Exception("'fade_out' necesita que definas tiempo_vida")
         return nuevo
 
     def gp_nieve(capa=None, **cambios):
@@ -784,6 +996,15 @@ init python:
         GP_TipoParticula para ajustar puntualmente esta lluvia.
         """
         return gp_crear_particulas(tipo=_gp_tipo_con_cambios(GP_LLUVIA, cambios), capa=capa)
+
+    def gp_luciernagas(capa=None, **cambios):
+        """
+        Atajo para crear el efecto de luciernagas ya configurado (ver los
+        GP_LUCIERNAGAS_* de la seccion "CONFIGURACION"). Funciona igual
+        que gp_nieve(): devuelve un identificador y acepta parametros de
+        GP_TipoParticula para ajustar puntualmente este efecto.
+        """
+        return gp_crear_particulas(tipo=_gp_tipo_con_cambios(GP_LUCIERNAGAS, cambios), capa=capa)
 
 
 # Pantalla (screen) interna que efectivamente muestra el efecto en

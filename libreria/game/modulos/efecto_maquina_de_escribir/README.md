@@ -124,5 +124,10 @@ ajuste a su gusto.
 ## Compatibilidad y licencia
 
 - Compatible con Ren'Py 7.x y 8.x.
-- Uso libre para la comunidad hispanohablante de Ren'Py: podés copiar,
-  modificar y redistribuir este módulo sin necesidad de dar crédito.
+- Licencia **MIT**, Copyright (c) 2026 davinzifc. Podés usar, copiar,
+  modificar y redistribuir este módulo, incluso en juegos comerciales,
+  **siempre que des crédito al desarrollador**: mantené el aviso de
+  copyright y la licencia (ya están en el encabezado del archivo
+  `.rpy`) en todas las copias o partes sustanciales que distribuyas, por
+  ejemplo en la carpeta de créditos de tu juego. El texto completo está
+  en el archivo `LICENSE` de la raíz del repositorio.
