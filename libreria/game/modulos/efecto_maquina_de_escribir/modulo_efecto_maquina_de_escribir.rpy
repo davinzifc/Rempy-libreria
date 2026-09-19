@@ -2,9 +2,11 @@
 #  MODULO: EFECTO MAQUINA DE ESCRIBIR (TEXTO LETRA POR LETRA)
 #  Version: 1.1
 #  Compatibilidad: Ren'Py 7.x / 8.x
-#  Licencia: Uso libre para la comunidad hispanohablante de Ren'Py.
-#            Puedes copiar, modificar y redistribuir este archivo sin
-#            necesidad de dar crédito.
+#  Licencia: MIT. Copyright (c) 2026 davinzifc.
+#            Puedes usar, copiar, modificar y redistribuir este archivo,
+#            siempre que mantengas este aviso de copyright y la licencia
+#            MIT (ver el archivo LICENSE del repositorio) en las copias.
+#            Es decir: hay que dar crédito al desarrollador.
 #
 #  Para instrucciones de instalacion, ejemplos de uso dentro del guion y
 #  mas detalles, abri el archivo "README.md" que viene junto a este

@@ -48,6 +48,17 @@ copiarlo a otro proyecto sea tan simple como copiar esa carpeta.
 
 ## Licencia
 
-Uso libre para la comunidad de Ren'Py: podés copiar, modificar y
-redistribuir cualquiera de estos módulos, en proyectos personales o
-comerciales, sin necesidad de dar crédito (aunque siempre se agradece).
+Licencia **MIT** (ver el archivo [`LICENSE`](LICENSE)), Copyright (c) 2026
+davinzifc.
+
+Podés usar, copiar, modificar y redistribuir cualquiera de estos
+módulos, en proyectos personales o comerciales, **con la condición de
+dar crédito al desarrollador**: en todas las copias o partes
+sustanciales que distribuyas tenés que mantener el aviso de copyright y
+el texto de la licencia. Con un juego, lo más simple es incluirlos en tu
+carpeta de créditos/licencias (o conservarlos en el encabezado del
+archivo `.rpy` del módulo, que ya los trae).
+
+Ejemplo de crédito para pegar:
+
+> Módulos de Ren'Py por davinzifc (MIT License).
