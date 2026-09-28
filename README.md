@@ -16,6 +16,7 @@ un canal de YouTube dedicado a enseñar Ren'Py. 💜
 | [Efecto Máquina de Escribir](libreria/game/modulos/efecto_maquina_de_escribir/README.md) | El texto de los diálogos aparece letra por letra, con un sonido de tecleo opcional y configurable. |
 | [Gestor de Partículas](libreria/game/modulos/gestor_particulas/README.md) | Efectos de partículas en pantalla (nieve, lluvia y cualquier efecto propio), con color plano o imagen, totalmente configurables: ángulo, velocidad, tamaño, rotación, etc. |
 | [Ruleta Rusa](libreria/game/modulos/ruleta_rusa/README.md) | Arma que apunta y dispara: tambor con recámaras reales, control exacto o al azar de dónde van las balas, sonidos configurables, culatazo, modo debug y flash de pantalla al recibir un disparo. |
+| [Sonidos de Interfaz](libreria/game/modulos/sonidos_interfaz/README.md) | Los botones suenan al pasar el cursor (hover) y al hacer click: menú principal, opciones de elección, menú de pausa. Se activa y configura en `options.rpy`, con volumen ajustable por el jugador desde Opciones, y se puede prender, apagar o cambiar en cualquier escena. |
 
 *(A medida que se agreguen más módulos, van a aparecer acá.)*
 
@@ -26,7 +27,10 @@ un canal de YouTube dedicado a enseñar Ren'Py. 💜
    instalación y configuración de ESE módulo en particular.
 2. En general, la idea es siempre la misma: copiás la carpeta completa
    del módulo dentro de `game/modulos/` en tu propio proyecto de Ren'Py,
-   y listo — no hace falta tocar ningún otro archivo.
+   y listo — en la mayoría no hace falta tocar ningún otro archivo.
+   Algunos módulos se activan o configuran desde `game/options.rpy` (el
+   archivo de configuración de todo proyecto de Ren'Py): cuando es así,
+   su `README.md` trae el bloque exacto para pegar ahí.
 
 ## Cómo ver los ejemplos en acción
 
@@ -41,6 +45,7 @@ Elegí qué módulo querés ver en acción.
 Gestor de partículas (nieve, lluvia, luciérnagas...)
 Efecto máquina de escribir (texto letra por letra)
 Ruleta rusa (arma que gira, apunta y dispara)
+Sonidos de interfaz (hover y click en botones)
 Salir
 ```
 
@@ -77,15 +82,20 @@ libreria/                          <- proyecto de Ren'Py (podés abrirlo con el 
     │   ├── gestor_particulas/            <- otro módulo, autocontenido en su carpeta
     │   │   ├── modulo_gestor_particulas.rpy
     │   │   └── README.md
-    │   └── ruleta_rusa/                  <- otro módulo, autocontenido en su carpeta
-    │       ├── modulo_ruleta_rusa.rpy
-    │       ├── imagenes/
+    │   ├── ruleta_rusa/                  <- otro módulo, autocontenido en su carpeta
+    │   │   ├── modulo_ruleta_rusa.rpy
+    │   │   ├── imagenes/
+    │   │   ├── audio/
+    │   │   └── README.md
+    │   └── sonidos_interfaz/             <- otro módulo, autocontenido en su carpeta
+    │       ├── modulo_sonidos_interfaz.rpy
     │       ├── audio/
     │       └── README.md
     └── vistas/                         <- ejemplos de uso, uno por módulo
         ├── ejemplo_efecto_maquina_de_escribir.rpy
         ├── ejemplo_gestor_particulas.rpy
-        └── ejemplo_ruleta_rusa.rpy
+        ├── ejemplo_ruleta_rusa.rpy
+        └── ejemplo_sonidos_interfaz.rpy
 ```
 
 Cada módulo vive en su propia carpeta, con todo lo que necesita adentro

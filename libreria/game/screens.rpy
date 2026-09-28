@@ -795,6 +795,9 @@ screen preferences():
                             if config.sample_sound:
                                 textbutton _("Prueba") action Play("sound", config.sample_sound)
 
+                        ## Volumen del hover y del click (modulo sonidos_interfaz).
+                        use si_preferencias_volumen
+
 
                     if config.has_voice:
                         label _("Volumen voz")

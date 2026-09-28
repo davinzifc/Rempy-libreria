@@ -31,5 +31,9 @@ label menu_principal:
             call ejemplo_ruleta_rusa
             jump menu_principal
 
+        "Sonidos de interfaz (hover y click en botones)":
+            call ejemplo_sonidos_interfaz
+            jump menu_principal
+
         "Salir":
             return
