@@ -65,6 +65,30 @@ define config.has_voice = True
 # define config.main_menu_music = "main-menu-theme.ogg"
 
 
+## Sonidos de interfaz (módulo sonidos_interfaz) ###############################
+##
+## Sonido al pasar el cursor (hover) y al hacer click en los botones: menú
+## principal, opciones de elección, menú de pausa... El módulo viene apagado:
+## estas líneas lo prenden para todo el juego. Ver
+## game/modulos/sonidos_interfaz/README.md para más opciones.
+
+## True = los botones suenan en todo el juego. False = módulo apagado (se puede
+## prender igual en una escena con si_activar()).
+
+define SI_ACTIVADO = True
+
+## True = el jugador puede ajustar el volumen del hover y del click con
+## deslizadores en Opciones. False = no aparecen y se usa siempre el volumen de
+## abajo.
+
+define SI_CONTROL_USUARIO = True
+
+## Volumen con el que arranca cada sonido, de 0.0 (silencio) a 1.0 (máximo).
+
+define SI_VOLUMEN_HOVER = 0.5
+define SI_VOLUMEN_CLICK = 0.8
+
+
 ## Transiciones ################################################################
 ##
 ## Estas variables ajustan transiciones usadas ante ciertos eventos. Cada
